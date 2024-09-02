@@ -33,12 +33,17 @@ async function draw(el, scale) {
     colorScale = d3
       .scaleQuantize()
       .domain(d3.extent(dataset))
-      .range(["paleturquoise", "darkcyan", "crimson"]);
+      .range(["paleturquoise", "darkcyan", "palevioletred"]);
   } else if (scale === "quantile") {
     colorScale = d3
       .scaleQuantile()
       .domain(dataset)
-      .range(["paleturquoise", "darkcyan", "crimson"]);
+      .range(["paleturquoise", "darkcyan", "palevioletred"]);
+  } else if (scale === "threshold") {
+    colorScale = d3
+      .scaleThreshold()
+      .domain([30000, 80000, 130000])
+      .range(["paleturquoise", "darkcyan", "palevioletred", "purple"]);
   }
 
   // Draw scales
@@ -66,3 +71,4 @@ async function draw(el, scale) {
 draw("#heatmap1", "linear");
 draw("#heatmap2", "quantize");
 draw("#heatmap3", "quantile");
+draw("#heatmap4", "threshold");
