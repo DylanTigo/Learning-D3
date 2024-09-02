@@ -1,6 +1,7 @@
 async function draw(el, scale) {
   // Data
   const dataset = await d3.json("data.json");
+  dataset.sort((a, b) => a - b);
 
   // Dimensions
   let dimensions = {
@@ -20,14 +21,6 @@ async function draw(el, scale) {
     .attr("width", dimensions.width)
     .attr("height", dimensions.height);
 
-  const container = svg
-    .append("g")
-    .attr("fill", "#ddd")
-    .attr(
-      "transform",
-      `translate(${dimensions.margin.x}, ${dimensions.margin.y})`
-    );
-
   // Scales
   let colorScale;
 
@@ -36,7 +29,26 @@ async function draw(el, scale) {
       .scaleLinear()
       .domain(d3.extent(dataset))
       .range(["white", "blue"]);
+  } else if (scale === "quantize") {
+    colorScale = d3
+      .scaleQuantize()
+      .domain(d3.extent(dataset))
+      .range(["paleturquoise", "darkcyan", "crimson"]);
+  } else if (scale === "quantile") {
+    colorScale = d3
+      .scaleQuantile()
+      .domain(dataset)
+      .range(["paleturquoise", "darkcyan", "crimson"]);
   }
+
+  // Draw scales
+  const container = svg
+    .append("g")
+    .attr("fill", "#ddd")
+    .attr(
+      "transform",
+      `translate(${dimensions.margin.x}, ${dimensions.margin.y})`
+    );
 
   container
     .selectAll("rect")
@@ -52,3 +64,5 @@ async function draw(el, scale) {
 }
 
 draw("#heatmap1", "linear");
+draw("#heatmap2", "quantize");
+draw("#heatmap3", "quantile");
