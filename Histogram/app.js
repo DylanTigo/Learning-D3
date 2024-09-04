@@ -28,9 +28,10 @@ async function draw() {
 
   const labels = ctr.append("g").classed("bar-labels", true);
   const axisG = ctr
-      .append("g")
-      .attr("transform", `translate(0, ${dimensions.ctrHeight})`)
+    .append("g")
+    .attr("transform", `translate(0, ${dimensions.ctrHeight})`);
 
+  const meanLine = ctr.append("line").classed("mean-line", true);
   // HistogramD Draw function
   const histogram = (metric) => {
     const xAccessor = (d) => d.currently[metric];
@@ -56,30 +57,74 @@ async function draw() {
       .range([dimensions.ctrHeight, 0])
       .nice();
 
+    const exitTransition = d3.transition().duration(1000);
     // Draw the bars
     ctr
       .selectAll("rect")
       .data(newData)
-      .join("rect")
+      .join(
+        (enter) =>
+          enter
+            .append("rect")
+            .attr("width", (d) => d3.max([xScale(d.x1) - xScale(d.x0) - 1, 0]))
+            .attr("height", 0)
+            .attr("x", (d) => xScale(d.x0))
+            .attr("y", (d) => dimensions.ctrHeight)
+            .attr("shape-rendering", "auto")
+            .attr("fill", "#b8de6f"),
+        (update) => update,
+        (exit) =>
+          exit
+            .attr("fill", "#f39233")
+            .transition(exitTransition)
+            .attr("y", dimensions.ctrHeight)
+            .attr("height", 0)
+            .remove()
+      )
+      .transition()
+      .duration(1000)
+      .attr("fill", "purple")
       .attr("width", (d) => d3.max([xScale(d.x1) - xScale(d.x0) - 1, 0]))
       .attr("height", (d) => dimensions.ctrHeight - yScale(yAccessor(d)))
       .attr("x", (d) => xScale(d.x0))
-      .attr("y", (d) => yScale(yAccessor(d)))
-      .attr("fill", "purple")
-      .attr("shape-rendering", "auto");
+      .attr("y", (d) => yScale(yAccessor(d)));
 
     labels
       .selectAll("text")
       .data(newData)
-      .join("text")
+      .join(
+        (enter) =>
+          enter
+            .append("text")
+            .attr("x", (d) => xScale(d.x0) + (xScale(d.x1) - xScale(d.x0)) / 2)
+            .attr("y", (d) => dimensions.ctrHeight - 5)
+            .text(yAccessor),
+        (update) => update,
+        (exit) =>
+          exit
+            .transition()
+            .duration(1000)
+            .attr("y", dimensions.ctrHeight)
+            .remove()
+      )
+      .transition()
+      .duration(1000)
       .attr("x", (d) => xScale(d.x0) + (xScale(d.x1) - xScale(d.x0)) / 2)
-      .attr("y", (d) => yScale(yAccessor(d) + 5))
+      .attr("y", (d) => yScale(yAccessor(d) + 3))
       .text(yAccessor);
 
+    const mean = d3.mean(dataset, xAccessor);
+    meanLine
+      .raise()
+      .transition()
+      .duration(1000)
+      .attr("x1", xScale(mean))
+      .attr("y1", 0)
+      .attr("x2", xScale(mean))
+      .attr("y2", dimensions.ctrHeight);
     // Axes
     const axis = d3.axisBottom(xScale);
-    
-      axisG.call(axis);
+    axisG.transition().call(axis);
   };
 
   d3.select("#metric").on("change", (e) => {
