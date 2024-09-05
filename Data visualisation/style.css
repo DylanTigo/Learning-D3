@@ -28,6 +28,10 @@
   font-weight: bold;
 }
 
+.dot-hovered {
+  pointer-events: none;
+}
+
 #tooltip span {
   font-weight: bold;
   color: purple
@@ -35,4 +39,10 @@
 
 .axis {
   font-size: 12px;  
+}
+
+.mean-line {
+  stroke: rgba(128, 0, 128, 0.762);
+  stroke-dasharray: 6;
+  stroke-width: 2px;
 }

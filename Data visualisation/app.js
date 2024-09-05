@@ -114,7 +114,21 @@ const getData = async () => {
   const voronoi = delaunay.voronoi();
 
   delaunay.render();
-  console.log(delaunay.render());
+
+  const xLine = container
+    .append("line")
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", 0)
+    .attr("y2", 0)
+    .classed("mean-line", true);
+  const yLine = container
+    .append("line")
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", 0)
+    .attr("y2", dimensions.containerHeight)
+    .classed("mean-line", true);
 
   container
     .append("g")
@@ -131,7 +145,20 @@ const getData = async () => {
         .attr("cx", xScale(xAccessor(datum)))
         .attr("cy", yScale(yAccessor(datum)))
         .attr("r", 6)
-        .attr("fill", "purple")
+        .attr("fill", "purple");
+
+      xLine
+        .transition()
+        .duration(100)
+        .attr("x1", dimensions.containerWidth)
+        .attr("y1", yScale(yAccessor(datum)))
+        .attr("y2", yScale(yAccessor(datum)));
+      yLine
+        .transition()
+        .duration(100)
+        .attr("x1", xScale(xAccessor(datum)))
+        .attr("x2", xScale(xAccessor(datum)))
+        .attr("y2", dimensions.containerHeight);
 
       tooltip
         .classed("show", true)

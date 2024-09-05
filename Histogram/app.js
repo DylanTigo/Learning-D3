@@ -115,7 +115,6 @@ async function draw() {
 
     const mean = d3.mean(dataset, xAccessor);
 
-    console.log(mean);
     meanLine
       .raise()
       .transition()
