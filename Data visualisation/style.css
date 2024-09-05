@@ -1,0 +1,38 @@
+#chart{
+  width: 650px;
+  height: 600px;
+  background-color: #f7f7f7;
+  margin: 25px auto;
+  position: relative;
+  font-family: sans-serif;
+}
+
+#tooltip {
+  border: 1px solid #ccc;
+  position: absolute;
+  font-size: 12px;
+  padding: 10px;
+  background-color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.5s;
+}
+#tooltip.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+#tooltip .metric-date {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+#tooltip span {
+  font-weight: bold;
+  color: purple
+}
+
+.axis {
+  font-size: 12px;  
+}
