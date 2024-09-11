@@ -30,10 +30,19 @@ async function draw() {
       `translate(${dimensions.margins}, ${dimensions.margins})`
     );
 
+  const tooltip = d3.select("#tooltip");
+  const tooltipDot = ctr
+    .append("circle")
+    .attr("r", 4)
+    .attr("fill", "blue")
+    .attr("stroke", "black")
+    .attr("stroke-width", 1)
+    .style("opacity", 0)
+    .style("pointer-events", "none");
   // Scales
   const yScale = d3
     .scaleLinear()
-    .domain([0, d3.max(dataset, yAccessor)])
+    .domain(d3.extent(dataset, yAccessor))
     .range([dimensions.ctrHeight, 0])
     .nice();
 
@@ -57,16 +66,56 @@ async function draw() {
     .attr("stroke-width", 2);
 
   // Axes
-  const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%b %Y")).tickSizeOuter(false);
-  const yAxis = d3.axisLeft(yScale).tickFormat((d) => "$" + d).tickSizeOuter(false);
+  const xAxis = d3
+    .axisBottom(xScale)
+    .tickFormat(d3.timeFormat("%b %Y"))
+    .tickSizeOuter(false);
+  const yAxis = d3
+    .axisLeft(yScale)
+    .tickFormat((d) => "$" + d)
+    .tickSizeOuter(false);
 
   // Draw the axes
   const xAxisG = ctr
     .append("g")
     .attr("transform", `translate(0, ${dimensions.ctrHeight})`)
     .call(xAxis);
-
   const yAxisG = ctr.append("g").call(yAxis);
+
+  // Tooltip
+  ctr
+    .append("rect")
+    .attr("width", dimensions.ctrWidth)
+    .attr("height", dimensions.ctrHeight)
+    .style("opacity", 0)
+    .on("touchmove mousemove", (event) => {
+      const mousePos = d3.pointer(event, ctr.node());
+      const date = xScale.invert(mousePos[0]);
+
+      // Custom Bisector
+      const bisector = d3.bisector(xAccessor).left;
+      const index = bisector(dataset, date);
+      const stock = dataset[index - 1];
+
+      tooltipDot
+        .style("opacity", 1)
+        .attr("cx", xScale(xAccessor(stock)))
+        .attr("cy", yScale(yAccessor(stock)))
+        .raise();
+      tooltip
+        .style("display", "block")
+        .style("top", yScale(yAccessor(stock)) - 20 + "px")
+        .style("left", xScale(xAccessor(stock)) + "px");
+
+      tooltip.select(".price").text("$"+yAccessor(stock));
+
+      const dateFormat = d3.timeFormat("%B %-d, %Y");
+      tooltip.select(".date").text(dateFormat(xAccessor(stock)));
+    })
+    .on("mouseover", (event, d) => {
+      tooltip.style("display", "none");
+      tooltipDot.style("opacity", 0);
+    });
 }
 
 draw();

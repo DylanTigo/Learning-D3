@@ -13,7 +13,7 @@ body{
   position: absolute;
   padding: 10px;
   background-color: #fff;
-  display: none;
+  display: block;
   pointer-events: none;
 }
 
