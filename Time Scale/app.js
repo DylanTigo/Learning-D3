@@ -24,7 +24,7 @@ async function draw() {
     .attr("height", dimensions.height);
 
   const ctr = svg
-    .append("g") // <g>
+    .append("g") 
     .attr(
       "transform",
       `translate(${dimensions.margins}, ${dimensions.margins})`
